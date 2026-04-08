@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 METADATA_FILE = BASE_DIR / "uploads_metadata.json"
+COMMENTS_FILE = BASE_DIR / "comments.json"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf"}
 
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -31,6 +32,20 @@ def _load_metadata() -> list[dict]:
 def _save_metadata(entries: list[dict]) -> None:
     with METADATA_FILE.open("w", encoding="utf-8") as f:
         json.dump(entries, f, ensure_ascii=False, indent=2)
+
+
+def _load_comments() -> dict:
+    """Carregar comentários de todas as fotos"""
+    if not COMMENTS_FILE.exists():
+        return {}
+    with COMMENTS_FILE.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _save_comments(comments: dict) -> None:
+    """Salvar comentários em JSON"""
+    with COMMENTS_FILE.open("w", encoding="utf-8") as f:
+        json.dump(comments, f, ensure_ascii=False, indent=2)
 
 
 def _is_allowed(filename: str) -> bool:
@@ -123,6 +138,55 @@ def delete_photo(photo_id: str):
     _save_metadata(entries)
     
     return jsonify({"ok": True, "message": "Foto deletada com sucesso"}), 200
+
+
+@app.get("/comments/<photo_id>")
+def get_comments(photo_id: str):
+    """Carregar comentários de uma foto"""
+    comments = _load_comments()
+    photo_comments = comments.get(photo_id, [])
+    return jsonify(photo_comments), 200
+
+
+@app.post("/comments")
+def add_comment():
+    """Adicionar comentário a uma foto"""
+    data = request.get_json()
+    
+    photo_id = (data.get("photo_id") or "").strip()
+    usuario = (data.get("usuario") or "").strip()
+    texto = (data.get("texto") or "").strip()
+    
+    if not photo_id or not usuario or not texto:
+        return jsonify({"ok": False, "error": "Campos obrigatórios faltando"}), 400
+    
+    comment = {
+        "id": uuid4().hex,
+        "usuario": usuario,
+        "texto": texto,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    comments = _load_comments()
+    if photo_id not in comments:
+        comments[photo_id] = []
+    
+    comments[photo_id].append(comment)
+    _save_comments(comments)
+    
+    return jsonify({"ok": True, "comment": comment}), 201
+
+
+@app.delete("/comments/<comment_id>")
+def delete_comment(comment_id: str):
+    """Deletar um comentário"""
+    comments = _load_comments()
+    
+    for photo_id in comments:
+        comments[photo_id] = [c for c in comments[photo_id] if c["id"] != comment_id]
+    
+    _save_comments(comments)
+    return jsonify({"ok": True, "message": "Comentário deletado"}), 200
 
 
 if __name__ == "__main__":
