@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Fotos | Galeria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FAF8F3;
+            --warm-white: #F5F1E8;
+            --tan: #E8DDD0;
+            --brown: #8B7355;
+            --dark-brown: #5C4D3F;
+            --charcoal: #3D3D3D;
+            --accent: #C9ADA7;
+            --soft-pink: #F2E9E4;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--cream);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 248, 243, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: var(--brown);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--brown);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--brown);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .hero {
+            margin-top: 80px;
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--cream) 0%, var(--warm-white) 100%);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--brown);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-divider {
+            width: 60px;
+            height: 2px;
+            background: var(--accent);
+            margin: 0 auto;
+        }
+
+        .upload-section {
+            background: white;
+            border: 1px solid rgba(139, 115, 85, 0.1);
+            border-radius: 4px;
+            padding: 4rem;
+            margin: 0 auto 4rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            max-width: 600px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--dark-brown);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--dark-brown);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
+            padding: 1rem;
+            background: var(--warm-white);
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            border-radius: 4px;
+            color: var(--charcoal);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: var(--brown);
+            background: white;
+            box-shadow: 0 4px 15px rgba(139, 115, 85, 0.1);
+        }
+
+        .form-hint {
+            color: var(--brown);
+            margin-top: 0.5rem;
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 300;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-upload {
+            background: var(--brown);
+            color: white;
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-upload:hover {
+            background: var(--dark-brown);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 115, 85, 0.2);
+        }
+
+        .btn-upload:active {
+            transform: translateY(0);
+        }
+
+        .gallery-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-subtitle {
+            color: var(--brown);
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid rgba(139, 115, 85, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 4px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--brown);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--brown);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .photo-card {
+            background: white;
+            border: 1px solid rgba(139, 115, 85, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .photo-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: var(--tan);
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: contrast(1.05) saturate(0.95);
+        }
+
+        .photo-card:hover .photo-image {
+            transform: scale(1.05);
+        }
+
+        .photo-info {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .photo-user {
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .photo-date {
+            font-size: 0.85rem;
+            color: var(--brown);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 300;
+        }
+
+        .photo-size {
+            font-size: 0.8rem;
+            color: var(--brown);
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-delete,
+        .btn-download {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-delete {
+            background: white;
+            color: var(--brown);
+        }
+
+        .btn-delete:hover {
+            background: var(--brown);
+            color: white;
+        }
+
+        .btn-download {
+            background: var(--soft-pink);
+            color: var(--brown);
+        }
+
+        .btn-download:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--brown);
+            grid-column: 1/-1;
+        }
+
+        .empty-gallery-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--accent);
+            background: white;
+            color: var(--brown);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--brown);
+            color: white;
+        }
+
+        .clear-all-btn {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            color: var(--brown);
+            border: 1px solid var(--brown);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .clear-all-btn:hover {
+            background: var(--brown);
+            color: white;
+        }
+
+        footer {
+            background: var(--warm-white);
+            border-top: 1px solid rgba(139, 115, 85, 0.1);
+            padding: 3rem 2rem 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: var(--brown);
+            font-size: 0.85rem;
+            font-weight: 300;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: var(--brown);
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-brown);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(250, 248, 243, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-top: 1px solid rgba(139, 115, 85, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .upload-section {
+                padding: 2rem;
+                max-width: 100%;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+            }
+
+            .clear-all-btn {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header id="header">
+        <nav>
+            <a href="album.html" class="logo">Galeria Fotos</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="album.html">Galeria</a></li>
+                <li><a href="upload.html">Upload</a></li>
+            </ul>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Compartilhe Suas Fotos</h1>
+        <p>Envie suas fotos com data e nome de autor</p>
+        <div class="hero-divider"></div>
+    </section>
+
+    <!-- Upload Form -->
+    <section class="upload-section">
+        <h2 class="section-title">Fazer Upload</h2>
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="usuario">Seu Nome</label>
+                <input type="text" id="usuario" name="usuario" placeholder="Digite seu nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="data">Data (opcional)</label>
+                <input type="date" id="data" name="data">
+            </div>
+
+            <div class="form-group">
+                <label for="arquivo">Selecione a Foto</label>
+                <input type="file" id="arquivo" name="arquivo" accept="image/*,.pdf" required>
+                <span class="form-hint">Formatos: JPG, PNG, GIF, WebP, PDF (Máx: 10MB)</span>
+            </div>
+
+            <button type="submit" class="btn btn-upload">Carregar Foto</button>
+        </form>
+    </section>
+
+    <!-- Stats -->
+    <section class="gallery-section">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPhotos">0</div>
+                <div class="stat-label">Total de Fotos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="uniqueUsers">0</div>
+                <div class="stat-label">Usuários</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalSize">0 MB</div>
+                <div class="stat-label">Espaço Usado</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <button class="filter-btn active" data-filter="all">Todas as Fotos</button>
+            <button class="filter-btn" data-filter="today">Hoje</button>
+            <button class="clear-all-btn" id="clearAllBtn">Limpar Tudo</button>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="empty-gallery">
+                <div class="empty-gallery-icon">📷</div>
+                <p>Nenhuma foto enviada ainda. Comece a compartilhar!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p style="color: var(--brown);">Compartilhe e organize suas fotos com elegância</p>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Galeria de Fotos. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        class PhotoGallery {
+            constructor() {
+                this.photos = [];
+                this.currentFilter = 'all';
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadPhotos();
+                this.renderGallery();
+                this.updateStats();
+            }
+
+            setupEventListeners() {
+                document.getElementById('uploadForm').addEventListener('submit', (e) => this.handleUpload(e));
+
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.handleFilter(e));
+                });
+
+                document.getElementById('clearAllBtn').addEventListener('click', () => this.clearAll());
+            }
+
+            async handleUpload(e) {
+                e.preventDefault();
+
+                const usuario = document.getElementById('usuario').value.trim();
+                const data = document.getElementById('data').value;
+                const fileInput = document.getElementById('arquivo');
+                const file = fileInput.files[0];
+
+                if (!usuario || !file) {
+                    this.showToast('Preencha todos os campos!');
+                    return;
+                }
+
+                console.log('Upload iniciado:', { usuario, data, fileName: file.name, fileSize: file.size });
+
+                const formData = new FormData();
+                formData.append('usuario', usuario);
+                formData.append('data', data);
+                formData.append('arquivo', file);
+
+                try {
+                    console.log('Enviando requisição POST para /upload');
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    console.log('Resposta recebida - Status:', response.status, 'OK:', response.ok);
+
+                    const text = await response.text();
+                    console.log('Texto da resposta:', text ? `${text.length} bytes` : 'vazio');
+                    console.log('Conteúdo completo:', text);
+                    
+                    if (!text || !text.trim()) {
+                        console.error('Resposta vazia do servidor!');
+                        console.log('Headers da resposta:', response.headers.get('content-type'));
+                        this.showToast('Erro: Servidor retornou resposta vazia');
+                        return;
+                    }
+
+                    let result;
+                    try {
+                        result = JSON.parse(text);
+                        console.log('JSON parseado com sucesso:', result);
+                    } catch (parseErr) {
+                        console.error('Erro ao fazer parse do JSON:', parseErr);
+                        console.log('Tentando parsear:', text.substring(0, 100));
+                        this.showToast('Erro: Resposta inválida do servidor');
+                        return;
+                    }
+
+                    if (response.ok) {
+                        console.log('Upload bem-sucedido!');
+                        this.photos.push(result.item);
+                        this.renderGallery();
+                        this.updateStats();
+                        this.showToast('✓ Foto enviada com sucesso!');
+                        document.getElementById('uploadForm').reset();
+                    } else {
+                        console.warn('Upload falhou com status:', response.status);
+                        this.showToast('Erro: ' + (result.error || 'Upload falhou'));
+                    }
+                } catch (err) {
+                    console.error('Erro na requisição:', err);
+                    this.showToast('Erro ao carregar: ' + err.message);
+                }
+            }
+
+            handleFilter(e) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+
+                this.currentFilter = e.target.dataset.filter;
+                this.renderGallery();
+            }
+
+            getFilteredPhotos() {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                return this.photos.filter(photo => {
+                    if (this.currentFilter === 'today') {
+                        const photoDate = new Date(photo.data_upload_utc);
+                        photoDate.setHours(0, 0, 0, 0);
+                        return photoDate.getTime() === today.getTime();
+                    }
+                    return true;
+                });
+            }
+
+            renderGallery() {
+                const gallery = document.getElementById('galleryGrid');
+                const filtered = this.getFilteredPhotos();
+
+                if (filtered.length === 0) {
+                    gallery.innerHTML = `
+                        <div style="grid-column: 1/-1;">
+                            <div class="empty-gallery">
+                                <div class="empty-gallery-icon">📷</div>
+                                <p>Nenhuma foto encontrada</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                gallery.innerHTML = filtered.map(photo => {
+                    const fileSize = (Math.random() * 5).toFixed(2);
+                    const photoDate = new Date(photo.data_upload_utc).toLocaleString('pt-BR');
+                    return `
+                        <div class="photo-card">
+                            <img src="${photo.url_arquivo}" alt="${photo.usuario}" class="photo-image">
+                            <div class="photo-info">
+                                <div class="photo-user">👤 ${photo.usuario}</div>
+                                <div class="photo-date">📅 ${photoDate}</div>
+                                <div class="photo-size">💾 ${fileSize} MB</div>
+                                <div class="photo-actions">
+                                    <button class="btn-download" onclick="gallery.downloadPhoto('${photo.url_arquivo}', '${photo.arquivo_original}')">Download</button>
+                                    <button class="btn-delete" onclick="gallery.deletePhoto('${photo.id}')">Deletar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            deletePhoto(id) {
+                if (confirm('Deseja deletar esta foto?')) {
+                    // Fazer DELETE request ao servidor
+                    fetch(`/uploads/${id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remover da array local
+                            this.photos = this.photos.filter(p => p.id !== id);
+                            this.renderGallery();
+                            this.updateStats();
+                            this.showToast('✓ Foto deletada com sucesso');
+                        } else {
+                            this.showToast('Erro ao deletar foto');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Erro ao deletar:', err);
+                        this.showToast('Erro ao deletar: ' + err.message);
+                    });
+                }
+            }
+
+            downloadPhoto(url, filename) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.click();
+                this.showToast('Download iniciado');
+            }
+
+            clearAll() {
+                if (confirm('Tem certeza? Isso vai deletar TODAS as fotos da sessão!')) {
+                    // Deletar todas as fotos do servidor
+                    const photoIds = this.photos.map(p => p.id);
+                    
+                    Promise.all(
+                        photoIds.map(id => 
+                            fetch(`/uploads/${id}`, { method: 'DELETE' })
+                        )
+                    ).then(() => {
+                        this.photos = [];
+                        this.renderGallery();
+                        this.updateStats();
+                        this.showToast('✓ Todas as fotos foram deletadas');
+                    }).catch(err => {
+                        console.error('Erro ao deletar fotos:', err);
+                        this.showToast('Erro ao deletar fotos');
+                    });
+                }
+            }
+
+            updateStats() {
+                document.getElementById('totalPhotos').textContent = this.photos.length;
+                
+                const uniqueUsers = new Set(this.photos.map(p => p.usuario)).size;
+                document.getElementById('uniqueUsers').textContent = uniqueUsers;
+
+                const totalSize = (this.photos.length * (Math.random() * 5)).toFixed(2);
+                document.getElementById('totalSize').textContent = `${totalSize} MB`;
+            }
+
+            async loadPhotos() {
+                try {
+                    const response = await fetch('/uploads');
+                    
+                    if (!response.ok) {
+                        console.log('Servidor retornou status:', response.status);
+                        this.photos = [];
+                        return;
+                    }
+
+                    const text = await response.text();
+                    
+                    if (text && text.trim()) {
+                        try {
+                            this.photos = JSON.parse(text);
+                        } catch (parseErr) {
+                            console.error('Erro ao fazer parse de JSON:', parseErr);
+                            console.log('Conteúdo recebido:', text);
+                            this.photos = [];
+                        }
+                    } else {
+                        this.photos = [];
+                    }
+                } catch (err) {
+                    console.log('Primeira carga. Nenhuma foto no servidor ainda.');
+                    this.photos = [];
+                }
+            }
+
+            showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        let gallery;
+        document.addEventListener('DOMContentLoaded', () => {
+            gallery = new PhotoGallery();
+        });
+    </script>
+</body>
+</html>
