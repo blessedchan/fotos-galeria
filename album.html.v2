@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FAF8F3">
+    <meta name="description" content="Galeria de fotos compartilhada com upload e gerenciamento">
+    <link rel="manifest" href="manifest.json">
+    <title>Galeria de Fotos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FAF8F3;
+            --warm-white: #F5F1E8;
+            --tan: #E8DDD0;
+            --brown: #8B7355;
+            --dark-brown: #5C4D3F;
+            --charcoal: #3D3D3D;
+            --accent: #C9ADA7;
+            --soft-pink: #F2E9E4;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            --cream: #1a1a1a;
+            --warm-white: #242424;
+            --tan: #2d2d2d;
+            --brown: #d4a574;
+            --dark-brown: #e8c9a8;
+            --charcoal: #e8e8e8;
+            --accent: #c9a587;
+            --soft-pink: #3a3a3a;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 248, 243, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode header {
+            background: rgba(26, 26, 26, 0.95);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--tan);
+            border: none;
+            width: 50px;
+            height: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--brown);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--charcoal);
+        }
+
+        .hero {
+            margin-top: 80px;
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--cream) 0%, var(--warm-white) 100%);
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--brown);
+            margin: 0 auto 2rem;
+            max-width: 600px;
+        }
+
+        .hero-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            background: var(--cream);
+            color: var(--charcoal);
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--brown);
+            box-shadow: 0 0 10px rgba(139, 115, 85, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            background: var(--brown);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn:hover {
+            background: var(--dark-brown);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(92, 77, 63, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--brown);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            background: var(--warm-white);
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--charcoal);
+            text-transform: uppercase;
+        }
+
+        .gallery-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 0.5rem;
+        }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin-bottom: 3rem;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--warm-white);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slideshow-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slideshow-controls {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border-radius: 25px;
+            z-index: 10;
+        }
+
+        .slideshow-btn {
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .slideshow-btn:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+            animation: slideInUp 0.5s ease both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(92, 77, 63, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+        }
+
+        .photo-item:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .photo-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-date {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 4px;
+        }
+
+        .lightbox-info {
+            text-align: center;
+            color: white;
+            margin-top: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .lightbox-prev {
+            left: 1rem;
+        }
+
+        .lightbox-next {
+            right: 1rem;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        footer {
+            background: var(--warm-white);
+            border-top: 1px solid rgba(139, 115, 85, 0.1);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--brown);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--cream);
+                flex-direction: column;
+                padding: 1.5rem;
+                gap: 1rem;
+            }
+
+            body.dark-mode .nav-links {
+                background: var(--warm-white);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .slideshow-container {
+                min-height: 200px;
+            }
+
+            .lightbox-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo">📸 Galeria</a>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" title="Alternar tema">
+                    <span>☀️</span>
+                    <span>🌙</span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="album.html">Galeria</a></li>
+                    <li><a href="upload.html">Upload</a></li>
+                </ul>
+                <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Momentos Capturados</h1>
+        <p>Uma coleção compartilhada de memórias especiais</p>
+
+        <div class="hero-controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar por usuário...">
+            <button class="btn" id="dateFilterBtn">📅 Filtro</button>
+            <a href="upload.html" class="btn btn-secondary">➕ Adicionar</a>
+        </div>
+
+        <div id="dateFilter" style="display: none;">
+            <input type="date" id="dateInput" class="search-box" style="max-width: 200px; margin: 1rem auto;">
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="totalStats">0</div>
+                <div class="stat-label">Fotos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="usersStats">0</div>
+                <div class="stat-label">Usuários</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="todayStats">0</div>
+                <div class="stat-label">Hoje</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-section">
+        <div id="slideshowContainer" style="display: none;">
+            <img id="slideshowImage" src="" alt="Slideshow" class="slideshow-image">
+            <div class="slideshow-controls">
+                <button class="slideshow-btn" id="playpauseBtn">▶</button>
+                <button class="slideshow-btn" onclick="changeSlide(-1)">❮</button>
+                <button class="slideshow-btn" onclick="changeSlide(1)">❯</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-section">
+        <div class="section-header">
+            <h2 class="section-title">Galeria</h2>
+        </div>
+        <div class="gallery-grid" id="gallery"></div>
+    </section>
+
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+            <img id="lightboxImage" src="" alt="">
+            <div class="lightbox-info" id="lightboxInfo"></div>
+            <button class="lightbox-nav lightbox-prev" onclick="changePhoto(-1)">❮</button>
+            <button class="lightbox-nav lightbox-next" onclick="changePhoto(1)">❯</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>📸 Galeria Compartilhada • Desenvolvido com ❤️</p>
+    </footer>
+
+    <script>
+        // Dark Mode
+        const themeToggle = document.getElementById('themeToggle');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        if (isDarkMode) document.body.classList.add('dark-mode');
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+
+        // Mobile Menu
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // Variables
+        let photos = [];
+        let currentPhotoIndex = 0;
+        let isPlaying = false;
+        let slideshowInterval;
+
+        // Load photos
+        async function loadPhotos() {
+            try {
+                const response = await fetch('/uploads');
+                const text = await response.text();
+                if (text && text.trim()) {
+                    photos = JSON.parse(text);
+                }
+                renderGallery();
+                updateStats();
+                renderSlideshow();
+            } catch (err) {
+                console.log('Galeria vazia');
+            }
+        }
+
+        // Filter photos
+        function filterPhotos() {
+            let filtered = [...photos];
+            
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            if (search) {
+                filtered = filtered.filter(p => p.usuario.toLowerCase().includes(search));
+            }
+
+            const dateFilter = document.getElementById('dateInput').value;
+            if (dateFilter) {
+                filtered = filtered.filter(p => {
+                    const photoDate = new Date(p.data_upload_utc).toISOString().split('T')[0];
+                    return photoDate === dateFilter;
+                });
+            }
+
+            return filtered;
+        }
+
+        // Render gallery
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            const filtered = filterPhotos();
+
+            gallery.innerHTML = filtered.map((photo, idx) => `
+                <div class="photo-item" onclick="openLightbox(${photos.indexOf(photo)})">
+                    <img src="${photo.url_arquivo}" alt="${photo.usuario}" loading="lazy">
+                    <div class="photo-overlay">
+                        <div class="photo-title">👤 ${photo.usuario}</div>
+                        <div class="photo-date">📅 ${new Date(photo.data_upload_utc).toLocaleString('pt-BR')}</div>
+                    </div>
+                </div>
+            `).join('') || '<p style="grid-column: 1/-1; text-align: center;">Nenhuma foto encontrada</p>';
+        }
+
+        // Event listeners
+        document.getElementById('searchBox').addEventListener('input', () => {
+            renderGallery();
+            renderSlideshow();
+        });
+
+        document.getElementById('dateInput').addEventListener('change', () => {
+            renderGallery();
+            renderSlideshow();
+        });
+
+        document.getElementById('dateFilterBtn').addEventListener('click', () => {
+            const filter = document.getElementById('dateFilter');
+            filter.style.display = filter.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Slideshow
+        function renderSlideshow() {
+            const filtered = filterPhotos();
+            const container = document.getElementById('slideshowContainer');
+            
+            if (filtered.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            currentPhotoIndex = 0;
+            updateSlideshow();
+        }
+
+        function updateSlideshow() {
+            const filtered = filterPhotos();
+            if (filtered.length === 0) return;
+
+            const photo = filtered[currentPhotoIndex];
+            document.getElementById('slideshowImage').src = photo.url_arquivo;
+        }
+
+        function changeSlide(direction) {
+            const filtered = filterPhotos();
+            if (filtered.length === 0) return;
+
+            currentPhotoIndex = (currentPhotoIndex + direction + filtered.length) % filtered.length;
+            updateSlideshow();
+        }
+
+        document.getElementById('playpauseBtn').addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            this.textContent = isPlaying ? '⏸' : '▶';
+
+            if (isPlaying) {
+                slideshowInterval = setInterval(() => changeSlide(1), 4000);
+            } else {
+                clearInterval(slideshowInterval);
+            }
+        });
+
+        // Lightbox
+        function openLightbox(index) {
+            currentPhotoIndex = index;
+            const photo = photos[index];
+            document.getElementById('lightboxImage').src = photo.url_arquivo;
+            document.getElementById('lightboxInfo').innerHTML = `
+                <p><strong>👤 ${photo.usuario}</strong></p>
+                <p>📅 ${new Date(photo.data_upload_utc).toLocaleString('pt-BR')}</p>
+            `;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function changePhoto(direction) {
+            currentPhotoIndex = (currentPhotoIndex + direction + photos.length) % photos.length;
+            openLightbox(currentPhotoIndex);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changePhoto(-1);
+                if (e.key === 'ArrowRight') changePhoto(1);
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        // Stats
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('totalStats').textContent = photos.length;
+            document.getElementById('usersStats').textContent = new Set(photos.map(p => p.usuario)).size;
+            document.getElementById('todayStats').textContent = photos.filter(p => 
+                new Date(p.data_upload_utc).toISOString().split('T')[0] === today
+            ).length;
+        }
+
+        // Init
+        loadPhotos();
+
+        // PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
