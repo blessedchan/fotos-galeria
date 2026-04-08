@@ -1,0 +1,44 @@
+{
+  "name": "Galeria de Fotos Compartilhada",
+  "short_name": "Galeria",
+  "description": "Sistema de galeria para compartilhamento de fotos com upload",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#8B7355",
+  "background_color": "#FAF8F3",
+  "categories": ["photography"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B7355' width='192' height='192'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B7355' width='192' height='192'/><circle cx='70' cy='60' r='20' fill='%23FAF8F3'/><path d='M 40 120 L 100 60 L 160 120' stroke='%23FAF8F3' stroke-width='12' fill='none'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Abrir Galeria",
+      "short_name": "Galeria",
+      "description": "Acessar a galeria de fotos",
+      "url": "/",
+      "icons": []
+    },
+    {
+      "name": "Fazer Upload",
+      "short_name": "Upload",
+      "description": "Fazer upload de novas fotos",
+      "url": "/upload.html",
+      "icons": []
+    }
+  ]
+}

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VSCO Photo Gallery | Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FAF8F3;
+            --warm-white: #F5F1E8;
+            --tan: #E8DDD0;
+            --brown: #8B7355;
+            --dark-brown: #5C4D3F;
+            --charcoal: #3D3D3D;
+            --accent: #C9ADA7;
+            --soft-pink: #F2E9E4;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--cream);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 248, 243, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: var(--brown);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--brown);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--brown);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--cream) 0%, var(--warm-white) 100%);
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--brown);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-divider {
+            width: 60px;
+            height: 2px;
+            background: var(--accent);
+            margin: 0 auto;
+        }
+
+        .btn-upload-hero {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2.5rem;
+            background: var(--brown);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-upload-hero:hover {
+            background: var(--dark-brown);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 115, 85, 0.2);
+        }
+
+        .btn-upload-hero:active {
+            transform: translateY(-1px);
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--dark-brown);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .section-subtitle {
+            color: var(--brown);
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Masonry Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .photo-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .photo-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: contrast(1.05) saturate(0.95);
+        }
+
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .photo-item:hover .photo-overlay {
+            transform: translateY(0);
+        }
+
+        .photo-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        .photo-date {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-caption {
+            text-align: center;
+            color: white;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        .lightbox-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lightbox-prev {
+            left: 2rem;
+        }
+
+        .lightbox-next {
+            right: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--warm-white);
+            border-top: 1px solid rgba(139, 115, 85, 0.1);
+            padding: 4rem 2rem 2rem;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: var(--brown);
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+            font-weight: 300;
+        }
+
+        .footer-section a:hover {
+            color: var(--dark-brown);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cream);
+            color: var(--brown);
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--brown);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(139, 115, 85, 0.1);
+            color: var(--brown);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-brown);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(250, 248, 243, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-top: 1px solid rgba(139, 115, 85, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 4rem 1.5rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .btn-upload-hero {
+                margin-top: 1.5rem;
+                padding: 0.9rem 2rem;
+                font-size: 0.85rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .lightbox-nav {
+                width: 45px;
+                height: 45px;
+                font-size: 1.5rem;
+            }
+
+            .lightbox-prev {
+                left: 1rem;
+            }
+
+            .lightbox-next {
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .btn-upload-hero {
+                margin-top: 1.2rem;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Animações suaves */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .photo-item {
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .photo-item:nth-child(1) { animation-delay: 0.1s; }
+        .photo-item:nth-child(2) { animation-delay: 0.2s; }
+        .photo-item:nth-child(3) { animation-delay: 0.3s; }
+        .photo-item:nth-child(4) { animation-delay: 0.4s; }
+        .photo-item:nth-child(5) { animation-delay: 0.5s; }
+        .photo-item:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Botão Upload */
+        .btn-upload-hero {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2.5rem;
+            background: var(--brown);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-upload-hero:hover {
+            background: var(--dark-brown);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 115, 85, 0.2);
+        }
+
+        .btn-upload-hero:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav>
+            <a href="#" class="logo">VSCO Gallery</a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">
+                <span>☰</span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Momentos Capturados</h1>
+        <p>Uma coleção cuidadosamente curada de memórias e momentos especiais</p>
+        <div class="hero-divider"></div>
+        <a href="upload.html" class="btn-upload-hero">+ Adicionar Fotos</a>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section" id="gallery">
+        <div class="section-header">
+            <h2 class="section-title">Galeria de Fotos</h2>
+            <p class="section-subtitle">Clique nas imagens para visualizar em tamanho completo</p>
+        </div>
+
+        <div class="gallery-grid">
+            <div class="photo-item" onclick="openLightbox(0)">
+                <img src="./carpo/WhatsApp Image 2026-04-05 at 01.30.09.jpeg" alt="Momento Especial 1">
+                <div class="photo-overlay">
+                    <h3 class="photo-title">Momento Especial</h3>
+                    <p class="photo-date">Abril 2026</p>
+                </div>
+            </div>
+
+            <div class="photo-item" onclick="openLightbox(1)">
+                <img src="./carpo/WhatsApp Image 2026-04-05 at 02.05.26.jpeg" alt="Memória Preciosa 2">
+                <div class="photo-overlay">
+                    <h3 class="photo-title">Memória Preciosa</h3>
+                    <p class="photo-date">Abril 2026</p>
+                </div>
+            </div>
+
+            <div class="photo-item" onclick="openLightbox(2)">
+                <img src="./carpo/WhatsApp Image 2026-04-05 at 02.19.45.jpeg" alt="Instante Único 3">
+                <div class="photo-overlay">
+                    <h3 class="photo-title">Instante Único</h3>
+                    <p class="photo-date">Abril 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="gallery-section" id="about" style="background: var(--warm-white); margin: 0; max-width: 100%; padding: 5rem 2rem;">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h2 class="section-title">Sobre Esta Coleção</h2>
+            <div class="hero-divider" style="margin: 2rem auto 2rem;"></div>
+            <p style="color: var(--brown); font-size: 1.1rem; line-height: 1.8; font-weight: 300;">
+                Cada fotografia conta uma história única. Esta galeria é uma celebração de momentos autênticos, 
+                capturados com sensibilidade e carinho. Explore, sinta e conecte-se com cada imagem.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>VSCO Gallery</h3>
+                <p>Capturando momentos que importam.</p>
+                <p>Transformando memórias em arte.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Navegação</h3>
+                <a href="#gallery">Galeria</a>
+                <a href="#about">Sobre</a>
+                <a href="#contact">Contato</a>
+            </div>
+            <div class="footer-section">
+                <h3>Conecte-se</h3>
+                <div class="social-links">
+                    <a href="#" title="Instagram">📷</a>
+                    <a href="#" title="Pinterest">📌</a>
+                    <a href="#" title="Email">✉️</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 VSCO Gallery. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <button class="lightbox-nav lightbox-prev" onclick="changePhoto(-1); event.stopPropagation();">‹</button>
+            <img id="lightbox-img" src="" alt="Visualização completa">
+            <button class="lightbox-nav lightbox-next" onclick="changePhoto(1); event.stopPropagation();">›</button>
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fotos da galeria
+        const photos = [
+            {
+                src: './carpo/WhatsApp Image 2026-04-05 at 01.30.09.jpeg',
+                title: 'Momento Especial',
+                date: 'Abril 2026'
+            },
+            {
+                src: './carpo/WhatsApp Image 2026-04-05 at 02.05.26.jpeg',
+                title: 'Memória Preciosa',
+                date: 'Abril 2026'
+            },
+            {
+                src: './carpo/WhatsApp Image 2026-04-05 at 02.19.45.jpeg',
+                title: 'Instante Único',
+                date: 'Abril 2026'
+            }
+        ];
+
+        let currentPhotoIndex = 0;
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Lightbox functions
+        function openLightbox(index) {
+            currentPhotoIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            
+            img.src = photos[index].src;
+            caption.textContent = `${photos[index].title} • ${photos[index].date}`;
+            
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event) {
+            if (event && event.target !== event.currentTarget && event.type === 'click') {
+                return;
+            }
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function changePhoto(direction) {
+            currentPhotoIndex += direction;
+            
+            if (currentPhotoIndex >= photos.length) {
+                currentPhotoIndex = 0;
+            } else if (currentPhotoIndex < 0) {
+                currentPhotoIndex = photos.length - 1;
+            }
+            
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            
+            img.style.opacity = '0';
+            
+            setTimeout(() => {
+                img.src = photos[currentPhotoIndex].src;
+                caption.textContent = `${photos[currentPhotoIndex].title} • ${photos[currentPhotoIndex].date}`;
+                img.style.opacity = '1';
+            }, 150);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    changePhoto(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changePhoto(1);
+                }
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add transition to lightbox image
+        const lightboxImg = document.getElementById('lightbox-img');
+        lightboxImg.style.transition = 'opacity 0.3s ease';
+
+        // Carregar fotos do servidor
+        async function loadServerPhotos() {
+            try {
+                const response = await fetch('/uploads');
+                if (!response.ok) {
+                    console.log('Servidor retornou status:', response.status);
+                    return;
+                }
+
+                const text = await response.text();
+                
+                if (text && text.trim()) {
+                    try {
+                        const serverPhotos = JSON.parse(text);
+                        
+                        // Adicionar fotos do servidor ao array
+                        serverPhotos.forEach(photo => {
+                            photos.push({
+                                src: photo.url_arquivo,
+                                title: photo.usuario,
+                                date: new Date(photo.data_upload_utc).toLocaleString('pt-BR'),
+                                usuario: photo.usuario,
+                                original: photo.arquivo_original
+                            });
+                        });
+
+                        // Re-renderizar a galeria
+                        renderGallery();
+                    } catch (parseErr) {
+                        console.error('Erro ao fazer parse de JSON:', parseErr);
+                        console.log('Conteúdo recebido:', text);
+                    }
+                }
+            } catch (err) {
+                console.log('Galeria carregada. (Sem fotos do servidor)');
+            }
+        }
+
+        // Renderizar galeria com novas fotos
+        function renderGallery() {
+            const galleryGrid = document.querySelector('.gallery-grid');
+            
+            // Limpar galeria (mantendo espaço limpo)
+            galleryGrid.innerHTML = '';
+            
+            // Renderizar todas as fotos
+            photos.forEach((photo, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.style.animationDelay = `${index * 0.1}s`;
+                photoItem.onclick = () => openLightbox(index);
+                
+                photoItem.innerHTML = `
+                    <img src="${photo.src}" alt="${photo.title}">
+                    <div class="photo-overlay">
+                        <h3 class="photo-title">${photo.title}</h3>
+                        <p class="photo-date">${photo.date}</p>
+                    </div>
+                `;
+                
+                galleryGrid.appendChild(photoItem);
+            });
+        }
+
+        // Carregar fotos quando a página carrega
+        document.addEventListener('DOMContentLoaded', loadServerPhotos);
+    </script>
+</body>
+</html>
