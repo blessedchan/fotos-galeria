@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | Galeria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cream: #f7f3eb;
+            --sand: #e9decd;
+            --brown: #8a6d4f;
+            --dark: #45362c;
+            --ink: #302822;
+            --alert: #9f4d4d;
+        }
+
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+            background:
+                radial-gradient(circle at top left, rgba(233, 222, 205, 0.9), transparent 35%),
+                linear-gradient(135deg, #fbf8f2 0%, #efe4d6 100%);
+            color: var(--ink);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .card {
+            width: min(100%, 430px);
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(138, 109, 79, 0.14);
+            border-radius: 24px;
+            box-shadow: 0 22px 60px rgba(69, 54, 44, 0.14);
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+        }
+
+        .hero {
+            padding: 2.5rem 2.5rem 1.25rem;
+        }
+
+        .eyebrow {
+            color: var(--brown);
+            font-size: 0.78rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 8vw, 3rem);
+            color: var(--dark);
+            line-height: 0.95;
+            margin-bottom: 0.9rem;
+        }
+
+        .subtitle {
+            color: #6f5a47;
+            font-size: 0.96rem;
+            line-height: 1.6;
+        }
+
+        form {
+            padding: 1.25rem 2.5rem 2.5rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        label {
+            display: grid;
+            gap: 0.5rem;
+            color: var(--dark);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.95rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(138, 109, 79, 0.24);
+            background: rgba(255, 250, 245, 0.9);
+            color: var(--ink);
+            font: inherit;
+        }
+
+        input:focus {
+            outline: 2px solid rgba(138, 109, 79, 0.18);
+            border-color: var(--brown);
+        }
+
+        button {
+            margin-top: 0.5rem;
+            border: 0;
+            border-radius: 999px;
+            padding: 1rem 1.2rem;
+            background: linear-gradient(135deg, #8a6d4f, #6f563e);
+            color: white;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .message {
+            min-height: 1.2rem;
+            color: var(--alert);
+            font-size: 0.9rem;
+        }
+
+        .tip {
+            color: #7c6956;
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <section class="hero">
+            <p class="eyebrow">Area protegida</p>
+            <h1>Entre na galeria</h1>
+            <p class="subtitle">Use seu usuario e senha para acessar as fotos, uploads e comentarios.</p>
+        </section>
+
+        <form id="loginForm">
+            <label>
+                Usuario
+                <input type="text" id="username" autocomplete="username" required>
+            </label>
+            <label>
+                Senha
+                <input type="password" id="password" autocomplete="current-password" required>
+            </label>
+            <p class="message" id="message"></p>
+            <button type="submit" id="submitButton">Entrar</button>
+            <p class="tip">Configure `ADMIN_USERNAME`, `ADMIN_PASSWORD` ou `ADMIN_PASSWORD_HASH` e `SECRET_KEY` no servidor.</p>
+        </form>
+    </main>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const message = document.getElementById('message');
+        const submitButton = document.getElementById('submitButton');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            message.textContent = '';
+            submitButton.disabled = true;
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    message.textContent = result.error || 'Nao foi possivel entrar.';
+                    return;
+                }
+
+                window.location.href = '/';
+            } catch (error) {
+                message.textContent = 'Erro ao conectar com o servidor.';
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

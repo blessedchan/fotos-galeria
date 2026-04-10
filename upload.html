@@ -582,6 +582,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a href="album.html">Galeria</a></li>
                 <li><a href="upload.html">Upload</a></li>
+                <li><a href="#" onclick="logout(event)">Sair</a></li>
             </ul>
             <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         </nav>
@@ -678,6 +679,21 @@
             }
         });
 
+        async function fetchWithAuth(url, options) {
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                window.location.href = '/login.html';
+                throw new Error('Sessao expirada');
+            }
+            return response;
+        }
+
+        async function logout(event) {
+            if (event) event.preventDefault();
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
         class PhotoGallery {
             constructor() {
                 this.photos = [];
@@ -724,7 +740,7 @@
 
                 try {
                     console.log('Enviando requisição POST para /upload');
-                    const response = await fetch('/upload', {
+                    const response = await fetchWithAuth('/upload', {
                         method: 'POST',
                         body: formData
                     });
@@ -831,7 +847,7 @@
             deletePhoto(id) {
                 if (confirm('Deseja deletar esta foto?')) {
                     // Fazer DELETE request ao servidor
-                    fetch(`/uploads/${id}`, {
+                    fetchWithAuth(`/uploads/${id}`, {
                         method: 'DELETE'
                     })
                     .then(response => {
@@ -867,7 +883,7 @@
                     
                     Promise.all(
                         photoIds.map(id => 
-                            fetch(`/uploads/${id}`, { method: 'DELETE' })
+                            fetchWithAuth(`/uploads/${id}`, { method: 'DELETE' })
                         )
                     ).then(() => {
                         this.photos = [];
@@ -893,7 +909,7 @@
 
             async loadPhotos() {
                 try {
-                    const response = await fetch('/uploads');
+                    const response = await fetchWithAuth('/uploads');
                     
                     if (!response.ok) {
                         console.log('Servidor retornou status:', response.status);

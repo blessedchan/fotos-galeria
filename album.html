@@ -752,6 +752,7 @@
                 <li><a href="upload.html">Upload</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><a href="#" onclick="logout(event)">Sair</a></li>
             </ul>
         </nav>
     </header>
@@ -987,9 +988,24 @@
         lightboxImg.style.transition = 'opacity 0.3s ease';
 
         // Carregar fotos do servidor
+        async function fetchWithAuth(url, options) {
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                window.location.href = '/login.html';
+                throw new Error('Sessao expirada');
+            }
+            return response;
+        }
+
+        async function logout(event) {
+            if (event) event.preventDefault();
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
         async function loadServerPhotos() {
             try {
-                const response = await fetch('/uploads');
+                const response = await fetchWithAuth('/uploads');
                 if (!response.ok) {
                     console.log('Servidor retornou status:', response.status);
                     return;
@@ -1066,7 +1082,7 @@
             if (!photoId) return;
 
             try {
-                const response = await fetch(`/comments/${photoId}`);
+                const response = await fetchWithAuth(`/comments/${photoId}`);
                 const comments = await response.json();
                 
                 const list = document.getElementById('commentsList');
@@ -1109,7 +1125,7 @@
             }
             
             try {
-                const response = await fetch('/comments', {
+                const response = await fetchWithAuth('/comments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ photo_id: photoId, usuario, texto })
